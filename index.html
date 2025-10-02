@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+   <link rel="manifest" href="/manifest.json" />
+	<meta name="theme-color" content="#151515" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パックマン Google - 無料オンラインゲーム | クラシックアーケードゲーム</title>
+    <meta name="description" content="伝説的なパックマンをブラウザで無料プレイ。Googleの記念ロゴから生まれた人気のアーケードゲームを今すぐ楽しもう。レスポンシブ対応、フルスクリーンモード搭載。">
+    <meta name="keywords" content="パックマン, Pac-Man, Google, オンラインゲーム, 無料ゲーム, アーケードゲーム, レトロゲーム">
+    <meta property="og:title" content="パックマン Google - 無料オンラインゲーム">
+    <meta property="og:description" content="伝説的なパックマンをブラウザで無料プレイ。クラシックアーケードゲームを今すぐ楽しもう。">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FFD700'/%3E%3Cpath d='M50 20 L50 50 L75 35 Z' fill='%23000'/%3E%3Ccircle cx='35' cy='35' r='5' fill='%23000'/%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid #ffd700;
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            text-align: center;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+            letter-spacing: 2px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5), 0 0 10px #ffd700; }
+            to { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5), 0 0 20px #ffd700, 0 0 30px #ff6b35; }
+        }
+
+        .ad-banner {
+            width: 728px;
+            height: 90px;
+            margin: 1.5rem auto;
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            border: 2px solid #ff6b35;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .ad-banner {
+                display: flex;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .game-wrapper {
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+            margin-bottom: 2rem;
+            border: 2px solid #ff6b35;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b35, #ffd700, #ff8c42, #ff6b35);
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(10px);
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            border: none;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+            background: linear-gradient(135deg, #ff8c42 0%, #ffd700 100%);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 75%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .game-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .game-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding-bottom: 0;
+            z-index: 9999;
+            border-radius: 0;
+        }
+
+        .content-section {
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #ff6b35;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .content-section h2 {
+            color: #ffd700;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            border-bottom: 3px solid #ff6b35;
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin-bottom: 1rem;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #3d3d5c 0%, #2d2d44 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #ff8c42;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            border-color: #ffd700;
+        }
+
+        .feature-card h3 {
+            color: #ffd700;
+            margin-bottom: 0.75rem;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card p {
+            color: #d0d0d0;
+            font-size: 0.95rem;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+            border-top: 3px solid #ffd700;
+            box-shadow: 0 -4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .footer p {
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem 0.5rem;
+            }
+
+            .game-wrapper {
+                padding: 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .pixel-border {
+            position: relative;
+        }
+
+        .pixel-border::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ffd700 0px,
+                #ffd700 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            pointer-events: none;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body>
+  <script>
+    if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/sw.js')
+    .then(registration => {console.log('Service Worker registered successfully:', registration);})
+    .catch(error => {console.log('Error in Service Worker registration:', error);});});}
+    </script>
+    <header class="header">
+        <h1>🎮 パックマン Google 🎮</h1>
+    </header>
+
+    <div class="ad-banner">
+        <div><script type="text/javascript">
+     atOptions = {
+       'key' : 'a619ca446cfd76fcd09e9d6d38122e50',
+       'format' : 'iframe',
+       'height' : 90,
+       'width' : 728,
+       'params' : {}
+     };
+   </script>
+   <script type="text/javascript" src="//www.highperformanceformat.com/a619ca446cfd76fcd09e9d6d38122e50/invoke.js"></script></div>
+    </div>
+
+    <div class="container">
+        <div class="game-wrapper pixel-border">
+            <div class="game-controls">
+                <button class="btn" onclick="toggleFullscreen()">⛶ フルスクリーン</button>
+            </div>
+            <div class="game-container" id="gameContainer">
+                <iframe loading="lazy" src="https://pacman-online.pages.dev/game/" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h2>🕹️ パックマン Googleについて</h2>
+            <p>
+                パックマン Googleは、2010年にGoogleがパックマン30周年を記念して制作した、伝説的なアーケードゲームのブラウザ版です。このインタラクティブなDoodleは瞬く間に世界中で話題となり、何百万人ものプレイヤーが懐かしいドットイーター体験を楽しみました。
+            </p>
+            <p>
+                1980年に誕生したオリジナルのパックマンは、ナムコ（現バンダイナムコエンターテインメント）によって開発され、ゲーム史上最も影響力のあるタイトルの一つとなりました。シンプルながら中毒性の高いゲームプレイは、今なお多くのファンに愛され続けています。
+            </p>
+        </section>
+
+        <section class="content-section">
+            <h2>🎯 ゲームの遊び方</h2>
+            <p>
+                パックマンを操作して迷路内のすべてのドットを食べつくすことが目標です。矢印キー（PC）またはスワイプ操作（モバイル）でパックマンを動かし、ゴースト（お化け）から逃げながらステージをクリアしましょう。
+            </p>
+            <p>
+                パワーエサを食べると、一定時間ゴーストを食べることができるようになります。この時間を利用して高得点を狙いましょう！各ステージには独自の迷路デザインがあり、戦略的な思考が求められます。
+            </p>
+        </section>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>🆓 完全無料</h3>
+                <p>登録不要、ダウンロード不要。ブラウザですぐにプレイ開始できます。</p>
+            </div>
+            <div class="feature-card">
+                <h3>📱 レスポンシブ対応</h3>
+                <p>PC、タブレット、スマートフォンなど、あらゆるデバイスで快適にプレイ可能。</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎮 オリジナル体験</h3>
+                <p>本家のゲームプレイを忠実に再現。懐かしいレトロサウンドも健在。</p>
+            </div>
+            <div class="feature-card">
+                <h3>⚡ 高速ロード</h3>
+                <p>軽量設計により、待ち時間なくすぐにゲームを楽しめます。</p>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h2>🏆 パックマンの歴史と文化的影響</h2>
+            <p>
+                パックマンは単なるゲームではなく、ポップカルチャーのアイコンとして確固たる地位を築きました。その独特なキャラクターデザインとゲームプレイは、後の無数のゲームに影響を与え、ビデオゲーム業界の発展に大きく貢献しました。
+            </p>
+            <p>
+                Google版パックマンは、インタラクティブなDoodleの先駆けとなり、検索エンジンがどのようにユーザーとエンゲージメントを深めるかの新しい可能性を示しました。このプロジェクトは、テクノロジーとエンターテインメントの融合の素晴らしい例として今も語り継がれています。
+            </p>
+        </section>
+
+        <section class="content-section">
+            <h2>💡 プレイのコツとテクニック</h2>
+            <p>
+                上級プレイヤーを目指すなら、ゴーストの動きパターンを学ぶことが重要です。各ゴーストには固有のAIがプログラムされており、その行動を予測することで効率的にステージをクリアできます。
+            </p>
+            <p>
+                パワーエサは戦略的に使用しましょう。すべてのゴーストが近くにいる時に使うことで、一度に多くのポイントを獲得できます。また、迷路の角を上手く利用してゴーストをかわすテクニックも習得しましょう。
+            </p>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 パックマン Google - クラシックアーケードゲームをブラウザで楽しもう</p>
+  
+    </footer>
+
+    <script>
+        function toggleFullscreen() {
+            const container = document.getElementById('gameContainer');
+            
+            if (!document.fullscreenElement) {
+                container.classList.add('fullscreen');
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.mozRequestFullScreen) {
+                    container.mozRequestFullScreen();
+                } else if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                }
+            } else {
+                container.classList.remove('fullscreen');
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', function() {
+            const container = document.getElementById('gameContainer');
+            if (!document.fullscreenElement) {
+                container.classList.remove('fullscreen');
+            }
+        });
+
+        document.addEventListener('webkitfullscreenchange', function() {
+            const container = document.getElementById('gameContainer');
+            if (!document.webkitFullscreenElement) {
+                container.classList.remove('fullscreen');
+            }
+        });
+    </script>
+  <script src="https://cdn.counter.dev/script.js" data-id="74211804-62e3-41a8-9f09-2f1eac9640fb" data-utcoffset="3"></script>
+
+</body>
+</html>
